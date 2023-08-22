@@ -39,8 +39,7 @@ fun CustomCard(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            onClick = onButtonClick
+                .padding(horizontal = 8.dp), onClick = onButtonClick
         ) {
             Text(text = buttonLabel)
         }

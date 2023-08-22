@@ -2,31 +2,35 @@ package com.example.awesomerates
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.awesomerates.domain.User
-import com.example.awesomerates.navigation.ApplicationDestination
-import com.example.awesomerates.navigation.back
-import com.example.awesomerates.ui.RatesScreen
-import com.example.awesomerates.ui.TransfersScreen
-import com.example.awesomerates.ui.UserScreenWrap
+import com.example.awesomerates.domain.state.MainScreenState
+import com.example.awesomerates.navigation.Screens
+import com.example.awesomerates.navigation.graphs.loginGraph
+import com.example.awesomerates.navigation.graphs.ratesScreen
+import com.example.awesomerates.navigation.graphs.transfersScreen
+import com.example.awesomerates.navigation.graphs.userInfoScreen
 import com.example.awesomerates.ui.theme.AwesomeRatesTheme
-import com.example.awesomerates.ui.viewmodel.UserViewModel
-import com.example.core.CustomCard
-import dev.olshevski.navigation.reimagined.AnimatedNavHost
-import dev.olshevski.navigation.reimagined.navigate
-import dev.olshevski.navigation.reimagined.rememberNavController
+import com.example.awesomerates.ui.viewmodel.MainViewModel
+import com.example.core.AppBar
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.getViewModel
 
@@ -38,100 +42,62 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val nav =
-                rememberNavController<ApplicationDestination>(startDestination = ApplicationDestination.Transfers)
-            BackHandler { nav.back() }
-
+            val mainViewModel: MainViewModel = getViewModel()
+            val nav = rememberNavController()
             AwesomeRatesTheme {
-                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    GreetingScreen(user.name)
-//                }
 
-                AnimatedNavHost(
-                    controller = nav,
-                    emptyBackstackPlaceholder = { nav.navigate(ApplicationDestination.Transfers) },
-                    transitionSpec = { _, _, to ->
-                        if (to == ApplicationDestination.Transfers) {
-                            slideIntoContainer(
-                                towards = AnimatedContentScope.SlideDirection.Start,
-                                initialOffset = { it },
-                            ) with fadeOut() + slideOutOfContainer(
-                                towards = AnimatedContentScope.SlideDirection.Start,
-                                targetOffset = { it / 3 },
-                            )
-                        } else {
-                            fadeIn() + slideIntoContainer(
-                                towards = AnimatedContentScope.SlideDirection.End,
-                                initialOffset = { it / 3 },
-                            ) with slideOutOfContainer(
-                                towards = AnimatedContentScope.SlideDirection.End,
-                                targetOffset = { it },
-                            )
-                        }
+                Scaffold(
+                    topBar = top@{
+                        if (!mainViewModel.state.topBarVisible) return@top
+                        AppBar(
+                            title = { Text(mainViewModel.state.title) },
+                            navigationIconVisible = mainViewModel.state.drawerEnabled,
+                            onNavigationIconClick = { nav.navigateUp() },
+                        )
+
                     },
-                ) { dest ->
-                    when (dest) {
-                        ApplicationDestination.Rates -> {
-                            RatesScreen(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .imePadding(),
-                                onActionClick = {
-                                    nav.navigate(ApplicationDestination.User)
+                    bottomBar = bottom@{
+                        if (!mainViewModel.state.bottomNavigationVisible) return@bottom
+                        BottomAppBar {
+                            val navBackStackEntry by nav.currentBackStackEntryAsState()
+                            val currentDestination = navBackStackEntry?.destination
+                            listOf(Screens.Rates, Screens.Transfers, Screens.User)
+                                .forEach { screen ->
+                                    NavigationBarItem(
+                                        icon = {
+                                            Icon(
+                                                Icons.Filled.Favorite,
+                                                contentDescription = null
+                                            )
+                                        },
+                                        label = { Text(screen.name) },
+                                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                        onClick = {
+                                            nav.navigate(screen.route) {
+//                                                popUpTo(nav.graph.findStartDestination().id) {
+//                                                    saveState = true
+//                                                }
+//                                                launchSingleTop = true
+//                                                restoreState = true
+                                            }
+                                        }
+                                    )
                                 }
-                            )
-                        }
-
-                        ApplicationDestination.Transfers -> {
-                            TransfersScreen(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .imePadding(),
-                                onActionClick = {
-                                    nav.navigate(ApplicationDestination.Rates)
-                                }
-                            )
-                        }
-
-                        ApplicationDestination.User -> {
-                            UserScreenWrap(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .imePadding(),
-                                onActionClick = {
-                                    nav.navigate(ApplicationDestination.Transfers)
-                                }
-                            )
-                        }
-
-                        is ApplicationDestination.Credentials -> {
-
                         }
                     }
-
+                ) { paddings ->
+                    NavHost(
+                        modifier = Modifier.padding(paddings),
+                        navController = nav,
+                        startDestination = Screens.LoginFlow.route
+                    ) {
+                        ratesScreen(nav, mainViewModel::updateState)
+                        transfersScreen(nav, mainViewModel::updateState)
+                        userInfoScreen(nav, mainViewModel::updateState)
+                        loginGraph(nav, mainViewModel::updateState)
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun GreetingScreen(
-    name: String,
-    modifier: Modifier = Modifier,
-    viewModel: UserViewModel = getViewModel()
-) {
-    CustomCard(modifier, viewModel.userName)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AwesomeRatesTheme {
-        GreetingScreen("Android")
     }
 }

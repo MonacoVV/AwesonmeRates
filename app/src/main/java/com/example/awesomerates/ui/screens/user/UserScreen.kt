@@ -1,5 +1,8 @@
-package com.example.awesomerates.ui
+package com.example.awesomerates.ui.screens.user
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,13 +28,18 @@ fun UserScreenWrap(
 @Composable
 fun UserScreen(
     modifier: Modifier = Modifier,
-    onNavigationClick: () -> Unit = {},
+    navigateToTransfers: () -> Unit = {},
     userName: String = "Preview"
 ) {
-    CustomCard(
-        modifier = modifier,
-        hintText = "User $userName Info",
-        buttonLabel = "To Transfers",
-        onButtonClick = onNavigationClick
-    )
+    Column(
+        modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        CustomCard(
+            hintText = "User $userName Info",
+            buttonLabel = "To Transfers",
+            onButtonClick = navigateToTransfers
+        )
+    }
+
 }
