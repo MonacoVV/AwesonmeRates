@@ -1,14 +1,9 @@
 package com.example.awesomerates.navigation.graphs
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.awesomerates.domain.state.MainScreenState
 import com.example.awesomerates.domain.state.MainScreenStateBuilder
 import com.example.awesomerates.navigation.Screens
 import com.example.awesomerates.ui.screens.user.UserScreen

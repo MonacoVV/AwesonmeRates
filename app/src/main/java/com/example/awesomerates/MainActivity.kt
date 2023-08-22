@@ -52,9 +52,8 @@ class MainActivity : ComponentActivity() {
                         AppBar(
                             title = { Text(mainViewModel.state.title) },
                             navigationIconVisible = mainViewModel.state.drawerEnabled,
-                            onNavigationIconClick = { nav.navigateUp() },
+                            onNavigationIconClick = { nav.popBackStack() },
                         )
-
                     },
                     bottomBar = bottom@{
                         if (!mainViewModel.state.bottomNavigationVisible) return@bottom
@@ -63,6 +62,7 @@ class MainActivity : ComponentActivity() {
                             val currentDestination = navBackStackEntry?.destination
                             listOf(Screens.Rates, Screens.Transfers, Screens.User)
                                 .forEach { screen ->
+                                    val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                                     NavigationBarItem(
                                         icon = {
                                             Icon(
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                                         label = { Text(screen.name) },
                                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                         onClick = {
-                                            nav.navigate(screen.route) {
+                                            if (!selected) nav.navigate(screen.route) {
 //                                                popUpTo(nav.graph.findStartDestination().id) {
 //                                                    saveState = true
 //                                                }

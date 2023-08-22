@@ -1,5 +1,6 @@
 package com.example.awesomerates.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +15,10 @@ class UserViewModel(
 ) : ViewModel()  {
 
     private val cnt = getCounter()
+
+    init {
+        Log.d("UserViewModel", "Created, sequence $cnt")
+    }
 
     companion object {
         private val counter = AtomicInteger(0)
