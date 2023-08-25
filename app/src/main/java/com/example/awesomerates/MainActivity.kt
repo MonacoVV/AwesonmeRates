@@ -12,17 +12,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.awesomerates.domain.User
-import com.example.awesomerates.domain.state.MainScreenState
 import com.example.awesomerates.navigation.Screens
 import com.example.awesomerates.navigation.graphs.loginGraph
 import com.example.awesomerates.navigation.graphs.ratesScreen
@@ -31,21 +25,18 @@ import com.example.awesomerates.navigation.graphs.userInfoScreen
 import com.example.awesomerates.ui.theme.AwesomeRatesTheme
 import com.example.awesomerates.ui.viewmodel.MainViewModel
 import com.example.core.AppBar
-import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.getViewModel
 
 
 class MainActivity : ComponentActivity() {
-
-    val user: User by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val mainViewModel: MainViewModel = getViewModel()
             val nav = rememberNavController()
-            AwesomeRatesTheme {
 
+            AwesomeRatesTheme {
                 Scaffold(
                     topBar = top@{
                         if (!mainViewModel.state.topBarVisible) return@top
@@ -89,7 +80,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         modifier = Modifier.padding(paddings),
                         navController = nav,
-                        startDestination = Screens.LoginFlow.route
+                        startDestination = if (mainViewModel.isUserAuthorized()) Screens.Rates.route else Screens.LoginFlow.route
                     ) {
                         ratesScreen(nav, mainViewModel::updateState)
                         transfersScreen(nav, mainViewModel::updateState)

@@ -31,7 +31,7 @@ fun LoginScreenPreView() {
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    onLoginComplete: () -> Unit = {}
+    onLoginComplete: (String) -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -59,7 +59,9 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            Button(onClick = onLoginComplete) {
+            Button(onClick = {
+                onLoginComplete.invoke(userName.value)
+            }) {
                 Text(text = "Login")
             }
         }

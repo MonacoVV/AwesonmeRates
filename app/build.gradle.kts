@@ -72,7 +72,6 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-//    implementation(libs.navreimagined)
     implementation(libs.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
@@ -81,4 +80,14 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+
+    // Serialization
+    implementation(libs.serialization.json)
+
+    // DataStore
+
+    implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.androidx.startup)
+
 }

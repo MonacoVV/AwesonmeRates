@@ -2,39 +2,32 @@ package com.example.awesomerates.ui.screens.user
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.awesomerates.ui.viewmodel.UserViewModel
 import com.example.core.CustomCard
-import org.koin.androidx.compose.getViewModel
-
-
-@Composable
-fun UserScreenWrap(
-    modifier: Modifier = Modifier,
-    onActionClick: () -> Unit,
-    viewModel: UserViewModel = getViewModel()
-) {
-    UserScreen(
-        modifier = modifier,
-        onActionClick,
-        userName = viewModel.userName
-    )
-}
 
 @Preview
 @Composable
 fun UserScreen(
     modifier: Modifier = Modifier,
     navigateToTransfers: () -> Unit = {},
-    userName: String = "Preview"
+    onLogoutClicked: () -> Unit = {},
+    userName: String = ""
 ) {
     Column(
         modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
     ) {
+        Row(horizontalArrangement = Arrangement.End) {
+            Button(onClick = onLogoutClicked) {
+                Text(text = "Logout")
+            }
+        }
         CustomCard(
             hintText = "User $userName Info",
             buttonLabel = "To Transfers",
